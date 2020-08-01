@@ -6,7 +6,8 @@ import Button from '../../../Components/Button';
 
 function CadastroCategoria() {
   const valoresIniciais = {
-    nome: '',
+    id: '',
+    titulo: '',
     descricao: '',
     cor: '',
   };
@@ -14,9 +15,10 @@ function CadastroCategoria() {
   const [values, setValues] = useState(valoresIniciais);
 
   function setValue(chave, valor) {
+    // chave: nome, descricao, bla, bli
     setValues({
       ...values,
-      [chave]: valor,
+      [chave]: valor, // nome: 'valor'
     });
   }
 
@@ -27,18 +29,12 @@ function CadastroCategoria() {
     );
   }
 
-  function handleSubmit(infosDoEvento) {
-    infosDoEvento.preventDefault();
-    setCategorias([
-      ...categorias,
-      values,
-    ]);
-
-    setValues(valoresIniciais);
-  }
+  // ============
 
   useEffect(() => {
-    const URL = 'https://you-flix.herokuapp.com/categorias';
+    const URL = window.location.href.includes('localhost')
+      ? 'http://localhost:8080/categorias'
+      : 'https://you-flix.herokuapp.com/categorias';
     fetch(URL)
       .then(async (respostaDoServer) => {
         if (respostaDoServer.ok) {
@@ -46,9 +42,9 @@ function CadastroCategoria() {
           setCategorias(resposta);
           return;
         }
-        throw new Error('Não foi possível pegar os dados de jeito nenhum');
+        throw new Error('Não foi possível pegar os dados');
       });
-  });
+  }, []);
 
   return (
     <PageDefault>
@@ -57,13 +53,20 @@ function CadastroCategoria() {
         {values.nome}
       </h1>
 
-      <form onSubmit={handleSubmit}>
-
+      <form onSubmit={function handleSubmit(infosDoEvento) {
+        infosDoEvento.preventDefault();
+        setCategorias([
+          ...categorias,
+          values,
+        ]);
+        setValues(valoresIniciais);
+      }}
+      >
         <FormField
           label="Nome da Categoria"
           type="text"
-          name="nome"
-          value={values.nome}
+          name="titulo"
+          value={values.titulo}
           onChange={handleChange}
         />
 
@@ -74,6 +77,7 @@ function CadastroCategoria() {
           value={values.descricao}
           onChange={handleChange}
         />
+
         <FormField
           label="Cor"
           type="color"
@@ -87,9 +91,15 @@ function CadastroCategoria() {
         </Button>
       </form>
 
+      {categorias.length === 0 && (
+        <div>
+          Carregando...
+        </div>
+      )}
+
       <ul>
-        {categorias.map((categoria, indice) => (
-          <li key={`${categoria}${indice}`}>
+        {categorias.map((categoria) => (
+          <li key={`${categoria.titulo}`}>
             {categoria.titulo}
           </li>
         ))}
