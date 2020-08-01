@@ -47,7 +47,7 @@ function CadastroCategoria() {
             setCategorias(resposta);
             return;
           }
-          throw new Error('Não foi possível pegar os dados');
+          throw new Error('Não foi possível pegar os dados de jeito nenhum');
         });
     }
   }, []);
